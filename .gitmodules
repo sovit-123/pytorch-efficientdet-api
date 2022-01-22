@@ -1,0 +1,3 @@
+[submodule "efficientdet-pytorch"]
+	path = efficientdet-pytorch
+	url = https://github.com/rwightman/efficientdet-pytorch
