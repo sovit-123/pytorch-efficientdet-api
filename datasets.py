@@ -86,6 +86,7 @@ class CustomDataset(Dataset):
         # prepare the final `target` dictionary
         target = {}
         target["boxes"] = boxes
+        target['boxes'][:,[0,1,2,3]] = target['boxes'][:,[1,0,3,2]]  #yxyx: very important
         target["labels"] = labels
         target["area"] = area
         target["iscrowd"] = iscrowd

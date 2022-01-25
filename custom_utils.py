@@ -5,7 +5,7 @@ import torch
 import matplotlib.pyplot as plt
 
 from albumentations.pytorch import ToTensorV2
-from config import DEVICE, CLASSES
+from config import DEVICE, CLASSES, OUT_DIR
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 plt.style.use('ggplot')
@@ -96,6 +96,8 @@ def show_tranformed_image(train_loader):
     Helps to check whether the tranformed images along with the corresponding
     labels are correct or not.
     Only runs if `VISUALIZE_TRANSFORMED_IMAGES = True` in config.py.
+
+    :param train_loader: Training data loader.  
     """
     if len(train_loader) > 0:
         for i in range(1):
@@ -129,7 +131,7 @@ def save_model(epoch, model, optimizer):
                 'epoch': epoch+1,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                }, 'outputs/last_model.pth')
+                }, f'{OUT_DIR}/last_model.pth')
 
 def save_loss_plot(OUT_DIR, train_loss_list, val_loss_list):
     """
@@ -168,19 +170,30 @@ def save_train_loss_plot(OUT_DIR, train_loss_list):
     plt.close('all')
 
 def save_validation_results(images, detections, counter):
+    """
+    Function to save validation results if provided in `config.py`.
+
+    :param images: All the images from the current batch.
+    :param detections: All the detection results.
+    :param counter: Step counter for saving with unique ID.
+    """
     for i, detection in enumerate(detections):
         image_c = images[i].clone()
         image_c = image_c.detach().cpu().numpy().astype(np.float32)
         image = np.transpose(image_c, (1, 2, 0))
-        box0 = int(detection[i][0].cpu().numpy())
-        box1 = int(detection[i][1].cpu().numpy())
-        box2 = int(detection[i][2].cpu().numpy())
-        box3 = int(detection[i][3].cpu().numpy())
-        # print(box0, box1, box2, box3)
         image = image / 2 + 0.5
         image = np.ascontiguousarray(image, dtype=np.float32)
-        cv2.rectangle(
-            image, (box0, box1),
-            (box2, box3), (255, 255, 255), 2
-        )
-        cv2.imwrite(f"outputs/image_{i}_{counter}.jpg", image*255.)
+
+        scores = detection[:, 4].cpu()
+        labels = detection[:, 5]
+        bboxes = detection[:, :4].detach().cpu().numpy()
+        boxes = bboxes[scores >= 0.3]
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        for i, box in enumerate(boxes):
+            cv2.rectangle(
+                image, 
+                (int(box[0]), int(box[1])),
+                (int(box[2]), int(box[3])),
+                (255, 255, 255), 2
+            )
+        cv2.imwrite(f"{OUT_DIR}/image_{i}_{counter}.jpg", image*255.)

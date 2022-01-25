@@ -1,7 +1,6 @@
 import math
 import sys
 import time
-import numpy as np
 
 import torch
 import torchvision.models.detection.mask_rcnn
@@ -20,6 +19,7 @@ def train_one_epoch(
     train_loss_hist,
     print_freq, 
     scaler=None,
+    scheduler=None
 ):
     model.train()
     metric_logger = utils.MetricLogger(delimiter="  ")
@@ -38,11 +38,11 @@ def train_one_epoch(
             optimizer, start_factor=warmup_factor, total_iters=warmup_iters
         )
 
+    step_counter = 0
     for images, targets in metric_logger.log_every(data_loader, print_freq, header):
-        # images = list(image.to(device) for image in images)
+        step_counter += 1
         images = torch.stack(images)
         images = images.to(device)
-        # targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
         boxes = [target['boxes'].to(device).float() for target in targets]
         labels = [target['labels'].to(device).float() for target in targets]
         
@@ -82,6 +82,9 @@ def train_one_epoch(
         batch_loss_list.append(loss_value)
         train_loss_hist.send(loss_value)
 
+        if scheduler is not None:
+            scheduler.step(epoch + (step_counter/len(data_loader)))
+
     return metric_logger, batch_loss_list
 
 
@@ -98,9 +101,13 @@ def _get_iou_types(model):
 
 
 @torch.inference_mode()
-def evaluate(model, data_loader, device):
+def evaluate(
+    model, 
+    data_loader, 
+    device,
+    save_valid_preds=False
+):
     n_threads = torch.get_num_threads()
-    # FIXME remove this and make paste_masks_in_image run on the GPU
     torch.set_num_threads(1)
     cpu_device = torch.device("cpu")
     model.eval()
@@ -114,11 +121,9 @@ def evaluate(model, data_loader, device):
     counter = 0
     for images, targets in metric_logger.log_every(data_loader, 100, header):
         counter += 1
-        # images = list(img.to(device) for img in images)
         images = torch.stack(images)
         images = images.to(device)
         batch_size = images.shape[0]
-        # targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
         boxes = [target['boxes'].to(device).float() for target in targets]
         labels = [target['labels'].to(device).float() for target in targets]
         
@@ -135,24 +140,18 @@ def evaluate(model, data_loader, device):
         
         detections = outputs['detections']
  
-        # order = [1, 0, 3, 2]
+        order = [1, 0, 3, 2]
         final_output = []
         for i, detection in enumerate(detections):
             detection_dict = {}
             detection_dict['boxes'] = detection[:, :4]
             # Executing the following line will do:
-            # XYXY to YXYX if it is XYXY originally
-            # or YXYX to XYXY if it is YXYX originally.
-            # detection_dict['boxes'] = detection_dict['boxes'][:, order]
+            # XYXY to YXYX if it is YXYX originally.
+            detection_dict['boxes'] = detection_dict['boxes'][:, order] # Needed as the original targets are in YXYX format.
             detection_dict['labels'] = detection[:, 5]
             detection_dict['scores'] = detection[:, 4]
             final_output.append(detection_dict)
 
-        save_validation_results(images, detections, counter)
-
-        # print(final_output)
-
-        # outputs = [{k: v.to(cpu_device) for k, v in t.items()} for t in outputs]
         final_output = [{k: v.to(cpu_device) for k, v in t.items()} for t in final_output]
         model_time = time.time() - model_time
 
@@ -161,6 +160,9 @@ def evaluate(model, data_loader, device):
         coco_evaluator.update(res)
         evaluator_time = time.time() - evaluator_time
         metric_logger.update(model_time=model_time, evaluator_time=evaluator_time)
+        
+        if save_valid_preds:
+            save_validation_results(images, detections, counter)
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()

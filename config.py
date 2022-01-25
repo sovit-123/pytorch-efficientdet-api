@@ -23,5 +23,9 @@ NUM_CLASSES = len(CLASSES)
 # whether to visualize images after crearing the data loaders
 VISUALIZE_TRANSFORMED_IMAGES = True
 
+# Whether to save the validation predictions during the 
+# validation step of each epoch.
+SAVE_VALID_PREDICTIONS = True
+
 # location to save model and plots
-OUT_DIR = 'outputs'
+OUT_DIR = 'outputs/training'
