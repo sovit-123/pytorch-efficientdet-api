@@ -5,7 +5,7 @@ from effdet import create_model
 
 def create_effdet_model(num_classes=None, pretrained=True):
     model = create_model(
-        'efficientdet_d0', 
+        'tf_efficientdet_lite0', 
         bench_task='train', 
         num_classes=num_classes , 
         # image_size=(IMAGE_SIZE,IMAGE_SIZE),

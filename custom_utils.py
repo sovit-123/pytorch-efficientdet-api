@@ -189,7 +189,7 @@ def save_validation_results(images, detections, counter):
         bboxes = detection[:, :4].detach().cpu().numpy()
         boxes = bboxes[scores >= 0.3]
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        for i, box in enumerate(boxes):
+        for j, box in enumerate(boxes):
             cv2.rectangle(
                 image, 
                 (int(box[0]), int(box[1])),

@@ -19,9 +19,7 @@ from custom_utils import (
     save_train_loss_plot,
     Averager
 )
-from effdet import (
-    create_model
-)
+from models.tf_efficientdet_lite0 import create_effdet_model
 
 import torch
 
@@ -40,21 +38,25 @@ if __name__ == '__main__':
     # iterations till ena and plot graphs for all iterations.
     train_loss_list = []
 
-    model = create_model(
-        'efficientdet_d0', 
-        bench_task='train', 
-        num_classes=NUM_CLASSES , 
-        # image_size=(IMAGE_SIZE,IMAGE_SIZE),
-        bench_labeler=True,
+    model = create_effdet_model(
+        num_classes=NUM_CLASSES,
         pretrained=True
     )
     model = model.to(DEVICE)
+    # Total parameters and trainable parameters.
+    total_params = sum(p.numel() for p in model.parameters())
+    print(f"{total_params:,} total parameters.")
+    total_trainable_params = sum(
+        p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"{total_trainable_params:,} training parameters.")
     # Get the model parameters.
     params = [p for p in model.parameters() if p.requires_grad]
     # Define the optimizer.
     optimizer = torch.optim.SGD(params, lr=0.001, momentum=0.9, weight_decay=0.005)
     # optimizer = torch.optim.AdamW(params, lr= 2e-4, weight_decay = 1e-6)
-    steps = 1 # LR will be zero as we approach `steps`.
+    # LR will be zero as we approach `steps` number of epochs each time.
+    # If `steps = 5`, LR will slowly reduce to zero every 5 epochs.
+    steps = 5
     scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
         optimizer, 
         T_0=steps,
