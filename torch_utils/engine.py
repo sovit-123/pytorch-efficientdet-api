@@ -66,21 +66,26 @@ def train_one_epoch(
             sys.exit(1)
 
         optimizer.zero_grad()
+
+        # The model outputs a loss dictionary and it already contains
+        # the cumulative loss in the `loss` key. It should be backpropagated,
+        # and not backpropagate `losses` which is the sum of all the losses.
+        loss_to_backprop = loss_dict['loss']
         if scaler is not None:
-            scaler.scale(losses).backward()
+            scaler.scale(loss_to_backprop).backward()
             scaler.step(optimizer)
             scaler.update()
         else:
-            losses.backward()
+            loss_to_backprop.backward()
             optimizer.step()
 
         if lr_scheduler is not None:
             lr_scheduler.step()
-        metric_logger.update(loss=losses_reduced)
+        metric_logger.update(loss=loss_to_backprop)
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
 
-        batch_loss_list.append(loss_value)
-        train_loss_hist.send(loss_value)
+        batch_loss_list.append(loss_to_backprop.detach().cpu())
+        train_loss_hist.send(loss_to_backprop.detach().cpu())
 
         if scheduler is not None:
             scheduler.step(epoch + (step_counter/len(data_loader)))
