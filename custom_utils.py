@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
+import os
 
 from albumentations.pytorch import ToTensorV2
 from config import DEVICE, CLASSES, OUT_DIR
@@ -197,3 +198,60 @@ def save_validation_results(images, detections, counter):
                 (255, 255, 255), 2
             )
         cv2.imwrite(f"{OUT_DIR}/image_{i}_{counter}.jpg", image*255.)
+
+def set_infer_dir():
+    """
+    This functions counts the number of inference directories already present
+    and creates a new one in `outputs/inference/`. And returns the directory path.
+    """
+    if not os.path.exists('outputs/inference'):
+        os.makedirs('outputs/inference')
+    num_infer_dirs_present = len(os.listdir('outputs/inference/'))
+    next_dir_num = num_infer_dirs_present + 1
+    new_dir_name = f"outputs/inference/res_{next_dir_num}"
+    os.makedirs(new_dir_name, exist_ok=True)
+    return new_dir_name
+
+def draw_bboxes(
+    image, 
+    outputs, 
+    w, h, 
+    detection_threshold, 
+    colors, 
+    classes
+):
+    """
+    Function draws bounding boxes around the `image` and returns
+    the result.
+    """
+    orig_h, orig_w = image.shape[0], image.shape[1]
+    scores = outputs[:, 4].cpu()
+    labels = outputs[:, 5]
+    bboxes = outputs[:, :4].detach().cpu().numpy()
+    boxes = bboxes[scores >= detection_threshold]
+
+    # Notice the -1 in the color and class indices in the
+    # following annotations. The model predicts from [1, NUM_CLASSES],
+    # but class indices start from 0. So, to manage that we have to -1
+    # from the predicted label number.
+    for i, box in enumerate(boxes):
+        box_0 = ((box[0]/w)*orig_w)
+        box_1 = ((box[1]/h)*orig_h)
+        box_2 = ((box[2]/w)*orig_w)
+        box_3 = ((box[3]/h)*orig_h)
+        cv2.rectangle(
+            image,
+            (int(box_0), int(box_1)),
+            (int(box_2), int(box_3)),
+            colors[int(labels[i])-1], 2
+        )
+        cv2.putText(
+            image, 
+            classes[int(labels[i])-1], 
+            (int(box_0), int(box_1-10)),
+            cv2.FONT_HERSHEY_SIMPLEX, 
+            0.8, 
+            colors[int(labels[i])-1], 2, 
+            lineType=cv2.LINE_AA
+        )
+    return image

@@ -1,0 +1,3 @@
+efficientdet_d0:
+  - image_width: 512
+  - image_height: 512
