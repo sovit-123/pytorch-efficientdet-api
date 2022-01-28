@@ -16,7 +16,7 @@ def create_effdet_model(
         bench_task=task, 
         num_classes=num_classes , 
         image_size=image_size,
-        bench_labeler=True,
+        # bench_labeler=True,
         pretrained=pretrained,
         checkpoint_path=checkpoint_path
     )

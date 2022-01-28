@@ -10,9 +10,6 @@ efficientdet_d1
 ...
 """
 
-import sys
-sys.path.insert(0, 'efficientdet-pytorch')
-
 import cv2
 import torch
 import numpy as np
@@ -56,7 +53,7 @@ if __name__ == '__main__':
         help='path to the input image'
     )
     parser.add_argument(
-        '-th', '--threshold', default=0.3,
+        '-th', '--threshold', default=0.3, type=float,
         help='detection threshold'
     )
     args = vars(parser.parse_args())

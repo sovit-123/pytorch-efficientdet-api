@@ -1,4 +1,4 @@
-image_path: data/inference_data/image_1.jpg
+video_path: data/inference_data/video_1.mp4
 nc: 90
 classes: [
     'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',

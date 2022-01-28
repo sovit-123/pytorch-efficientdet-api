@@ -125,8 +125,9 @@ while(cap.isOpened()):
             outputs = model(image.to(device))
         end_time = time.time()
 
+        time_taken = (end_time-start_time)
         # get the current fps
-        fps = 1 / (end_time - start_time)
+        fps = 1 / (time_taken)
         # add `fps` to `total_fps`
         total_fps += fps
         # increment frame count
@@ -143,6 +144,7 @@ while(cap.isOpened()):
         )
         cv2.imshow('Prediction', result)
         out.write(result)
+        print(f"Frame {frame_count}, time taken: {(time_taken):.3f}")
         # press `q` to exit
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
