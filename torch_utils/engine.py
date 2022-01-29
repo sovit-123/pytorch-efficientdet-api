@@ -110,7 +110,8 @@ def evaluate(
     model, 
     data_loader, 
     device,
-    save_valid_preds=False
+    save_valid_preds=False,
+    out_dir=None
 ):
     n_threads = torch.get_num_threads()
     torch.set_num_threads(1)
@@ -167,7 +168,7 @@ def evaluate(
         metric_logger.update(model_time=model_time, evaluator_time=evaluator_time)
         
         if save_valid_preds:
-            save_validation_results(images, detections, counter)
+            save_validation_results(images, detections, counter, out_dir)
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()

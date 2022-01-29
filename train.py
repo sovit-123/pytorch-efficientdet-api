@@ -1,34 +1,75 @@
-import sys
-sys.path.insert(0, 'efficientdet-pytorch')
-
 from torch_utils.engine import (
     train_one_epoch, evaluate
-)
-from config import (
-    DEVICE, NUM_CLASSES,
-    NUM_EPOCHS, NUM_WORKERS,
-    OUT_DIR, SAVE_VALID_PREDICTIONS
 )
 from datasets import (
     create_train_dataset, create_valid_dataset, 
     create_train_loader, create_valid_loader
 )
-
 from custom_utils import (
     save_model, 
     save_train_loss_plot,
     Averager
 )
-from models.tf_efficientdet_lite0 import create_effdet_model
+from models.efficientdet_model import create_effdet_model
+from custom_utils import set_training_dir
 
 import torch
+import argparse
+import yaml
 
 if __name__ == '__main__':
+    # Construct the argument parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-m', '--model', default='efficientdet_d0',
+        help='name of the model'
+    )
+    parser.add_argument(
+        '-c', '--config', default=None,
+        help='path to the data config file'
+    )
+    parser.add_argument(
+        '-d', '--device', 
+        default=torch.device('cuda:0' if torch.cuda.is_available() else 'cpu'),
+        help='computation/training device, default is GPU if GPU present'
+    )
+    parser.add_argument(
+        '-e', '--epochs', default=5, type=int,
+        help='number of epochs to train for'
+    )
+    args = vars(parser.parse_args())
+
+    # Load the model configurations
+    with open('model_configs/model_config.yaml') as file:
+        model_configs = yaml.safe_load(file)
+    # Load the data configurations
+    with open(args['config']) as file:
+        data_configs = yaml.safe_load(file)
+    
+    # Settings/parameters/constants.
+    TRAIN_DIR = data_configs['TRAIN_DIR']
+    VALID_DIR = data_configs['VALID_DIR']
+    CLASSES = data_configs['CLASSES']
+    NUM_CLASSES = data_configs['NC']
+    NUM_WORKERS = data_configs['NUM_WORKERS']
+    DEVICE = args['device']
+    NUM_EPOCHS = args['epochs']
+    SAVE_VALID_PREDICTIONS = data_configs['SAVE_VALID_PREDICTION_IMAGES']
+    BATCH_SIZE = data_configs['BATCH_SIZE']
+    OUT_DIR = set_training_dir()
+
+    # Model configurations
+    IMAGE_WIDTH = int(model_configs[args['model']][0]['image_width'])
+    IMAGE_HEIGHT = int(model_configs[args['model']][1]['image_height'])
     device = 'cuda:0'
-    train_dataset = create_train_dataset()
-    valid_dataset = create_valid_dataset()
-    train_loader = create_train_loader(train_dataset, NUM_WORKERS)
-    valid_loader = create_valid_loader(valid_dataset, NUM_WORKERS)
+    train_dataset = create_train_dataset(
+        TRAIN_DIR, IMAGE_WIDTH, IMAGE_HEIGHT, CLASSES
+    )
+    valid_dataset = create_valid_dataset(
+        VALID_DIR, IMAGE_WIDTH, IMAGE_HEIGHT, CLASSES
+    )
+    train_loader = create_train_loader(train_dataset, BATCH_SIZE, NUM_WORKERS)
+    valid_loader = create_valid_loader(valid_dataset, BATCH_SIZE, NUM_WORKERS)
     print(f"Number of training samples: {len(train_dataset)}")
     print(f"Number of validation samples: {len(valid_dataset)}\n")
 
@@ -39,8 +80,11 @@ if __name__ == '__main__':
     train_loss_list = []
 
     model = create_effdet_model(
+        model_name=args['model'],
         num_classes=NUM_CLASSES,
-        pretrained=True
+        pretrained=True,
+        task='train',
+        image_size=(IMAGE_HEIGHT, IMAGE_WIDTH),
     )
     model = model.to(DEVICE)
     # Total parameters and trainable parameters.
@@ -82,14 +126,15 @@ if __name__ == '__main__':
             model, 
             valid_loader, 
             device=DEVICE,
-            save_valid_preds=SAVE_VALID_PREDICTIONS
+            save_valid_preds=SAVE_VALID_PREDICTIONS,
+            out_dir=OUT_DIR
         )
 
         # Add the current epoch's batch-wise lossed to the `train_loss_list`.
         train_loss_list.extend(batch_loss_list)
 
         # Save the current epoch model.
-        save_model(epoch, model, optimizer)
+        save_model(epoch, model, optimizer, OUT_DIR)
 
         # Save loss plot.
         save_train_loss_plot(OUT_DIR, train_loss_list)

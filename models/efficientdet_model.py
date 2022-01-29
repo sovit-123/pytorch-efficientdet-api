@@ -14,10 +14,10 @@ def create_effdet_model(
     model = create_model(
         model_name, 
         bench_task=task, 
-        num_classes=num_classes , 
+        num_classes=num_classes, 
         image_size=image_size,
-        # bench_labeler=True,
         pretrained=pretrained,
-        checkpoint_path=checkpoint_path
+        checkpoint_path=checkpoint_path,
+        bench_labeler=True
     )
     return model

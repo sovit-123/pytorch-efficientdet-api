@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import os
 
 from albumentations.pytorch import ToTensorV2
-from config import DEVICE, CLASSES, OUT_DIR
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 plt.style.use('ggplot')
@@ -91,7 +90,7 @@ def get_valid_transform():
     })
 
 
-def show_tranformed_image(train_loader):
+def show_transformed_image(train_loader, DEVICE, CLASSES):
     """
     This function shows the transformed images from the `train_loader`.
     Helps to check whether the tranformed images along with the corresponding
@@ -120,7 +119,7 @@ def show_tranformed_image(train_loader):
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
-def save_model(epoch, model, optimizer):
+def save_model(epoch, model, optimizer, OUT_DIR):
     """
     Function to save the trained model till current epoch, or whenever called.
 
@@ -170,7 +169,7 @@ def save_train_loss_plot(OUT_DIR, train_loss_list):
     print('SAVING PLOTS COMPLETE...')
     plt.close('all')
 
-def save_validation_results(images, detections, counter):
+def save_validation_results(images, detections, counter, OUT_DIR):
     """
     Function to save validation results if provided in `config.py`.
 
@@ -202,13 +201,28 @@ def save_validation_results(images, detections, counter):
 def set_infer_dir():
     """
     This functions counts the number of inference directories already present
-    and creates a new one in `outputs/inference/`. And returns the directory path.
+    and creates a new one in `outputs/inference/`. 
+    And returns the directory path.
     """
     if not os.path.exists('outputs/inference'):
         os.makedirs('outputs/inference')
     num_infer_dirs_present = len(os.listdir('outputs/inference/'))
     next_dir_num = num_infer_dirs_present + 1
     new_dir_name = f"outputs/inference/res_{next_dir_num}"
+    os.makedirs(new_dir_name, exist_ok=True)
+    return new_dir_name
+
+def set_training_dir():
+    """
+    This functions counts the number of training directories already present
+    and creates a new one in `outputs/training/`. 
+    And returns the directory path.
+    """
+    if not os.path.exists('outputs/training'):
+        os.makedirs('outputs/training')
+    num_train_dirs_present = len(os.listdir('outputs/training/'))
+    next_dir_num = num_train_dirs_present + 1
+    new_dir_name = f"outputs/training/res_{next_dir_num}"
     os.makedirs(new_dir_name, exist_ok=True)
     return new_dir_name
 

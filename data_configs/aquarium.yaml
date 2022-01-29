@@ -1,0 +1,16 @@
+# Data configs.
+BATCH_SIZE: 4
+NUM_WORKERS: 4
+# TRAIN_DIR should be relative to train.py
+TRAIN_DIR: data/Aquarium Combined.v2-raw-1024.voc/train
+# VALID_DIR should be relative to train.py
+VALID_DIR: data/Aquarium Combined.v2-raw-1024.voc/valid
+# Class names.
+CLASSES: [
+    'fish', 'jellyfish', 'penguin', 'shark', 
+    'puffin', 'stingray', 'starfish'
+]
+# Number of classes.
+NC: 7
+# Whether to save the predictions of the validation set while training.
+SAVE_VALID_PREDICTION_IMAGES: True

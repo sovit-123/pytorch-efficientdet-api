@@ -43,5 +43,5 @@ tf_efficientdet_d7x:
   - image_height: 1536
 
 tf_efficientdet_lite0:
-  - image_width: 512
-  - image_height: 512
+  - image_width: 320
+  - image_height: 320

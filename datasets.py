@@ -5,9 +5,6 @@ import os
 import glob as glob
 
 from xml.etree import ElementTree as et
-from config import (
-    CLASSES, RESIZE_TO, TRAIN_DIR, VALID_DIR, BATCH_SIZE
-)
 from torch.utils.data import Dataset, DataLoader
 from custom_utils import collate_fn, get_train_transform, get_valid_transform
 
@@ -107,26 +104,34 @@ class CustomDataset(Dataset):
         return len(self.all_images)
 
 # prepare the final datasets and data loaders
-def create_train_dataset():
-    train_dataset = CustomDataset(TRAIN_DIR, RESIZE_TO, RESIZE_TO, CLASSES, get_train_transform())
+def create_train_dataset(train_dir, resize_width, resize_height, classes):
+    train_dataset = CustomDataset(
+        train_dir, 
+        resize_width, resize_height, 
+        classes, get_train_transform()
+    )
     return train_dataset
-def create_valid_dataset():
-    valid_dataset = CustomDataset(VALID_DIR, RESIZE_TO, RESIZE_TO, CLASSES, get_valid_transform())
+def create_valid_dataset(valid_dir, resize_width, resize_height, classes):
+    valid_dataset = CustomDataset(
+        valid_dir, 
+        resize_width, resize_height, 
+        classes, get_valid_transform()
+    )
     return valid_dataset
 
-def create_train_loader(train_dataset, num_workers=0):
+def create_train_loader(train_dataset, batch_size, num_workers=0):
     train_loader = DataLoader(
         train_dataset,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers,
         collate_fn=collate_fn
     )
     return train_loader
-def create_valid_loader(valid_dataset, num_workers=0):
+def create_valid_loader(valid_dataset, batch_size, num_workers=0):
     valid_loader = DataLoader(
         valid_dataset,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
         collate_fn=collate_fn
