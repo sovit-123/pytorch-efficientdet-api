@@ -6,7 +6,8 @@ from datasets import (
     create_train_loader, create_valid_loader
 )
 from custom_utils import (
-    save_model, 
+    save_model_state,
+    save_checkpoint,
     save_train_loss_plot,
     Averager
 )
@@ -133,8 +134,13 @@ if __name__ == '__main__':
         # Add the current epoch's batch-wise lossed to the `train_loss_list`.
         train_loss_list.extend(batch_loss_list)
 
-        # Save the current epoch model.
-        save_model(epoch, model, optimizer, OUT_DIR)
+        # Save the current epoch model state. This can be used 
+        # to resume training. It saves model state dict, number of
+        # epochs trained for, optimizer state dict, and loss function.
+        save_model_state(epoch, model, optimizer, OUT_DIR)
+
+        # Save just the model checkpoint.
+        save_checkpoint(model, OUT_DIR)
 
         # Save loss plot.
         save_train_loss_plot(OUT_DIR, train_loss_list)

@@ -7,6 +7,7 @@ python test_image.py --input <path/to/input/image> --model <model_name>
 `model_name` can be:
 efficientdet_d0
 efficientdet_d1
+tf_efficientdet_lite0
 ...
 """
 

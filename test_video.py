@@ -7,6 +7,7 @@ python test_image.py --input <path/to/input/image> --model <model_name>
 `model_name` can be:
 efficientdet_d0
 efficientdet_d1
+tf_efficientdet_lite0
 ...
 """
 
@@ -51,6 +52,11 @@ if __name__ == '__main__':
         help='name of the model'
     )
     parser.add_argument(
+        '-c', '--config', 
+        default='data_configs/test_video_config.yaml',
+        help='(optional) path to the data config file'
+    )
+    parser.add_argument(
         '-i', '--input', default=None,
         help='path to the input video'
     )
@@ -64,7 +70,7 @@ if __name__ == '__main__':
     with open('model_configs/model_config.yaml') as file:
         model_configs = yaml.safe_load(file)
     # Load the data configurations
-    with open('data_configs/test_video_config.yaml') as file:
+    with open(args['config']) as file:
         data_configs = yaml.safe_load(file)
 
     # Inference settings and constants

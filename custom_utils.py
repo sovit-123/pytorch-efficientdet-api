@@ -119,7 +119,7 @@ def show_transformed_image(train_loader, DEVICE, CLASSES):
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
-def save_model(epoch, model, optimizer, OUT_DIR):
+def save_model_state(epoch, model, optimizer, OUT_DIR):
     """
     Function to save the trained model till current epoch, or whenever called.
 
@@ -131,7 +131,16 @@ def save_model(epoch, model, optimizer, OUT_DIR):
                 'epoch': epoch+1,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                }, f'{OUT_DIR}/last_model.pth')
+                }, f'{OUT_DIR}/last_model_state.pth')
+
+def save_checkpoint(model, OUT_DIR):
+    """
+    Function to save the checkpoint only.
+
+    :param model: The neural network model.
+    :param optimizer: The optimizer.
+    """
+    torch.save(model.state_dict(), f"{OUT_DIR}/last_model_ckpt.pth")
 
 def save_loss_plot(OUT_DIR, train_loss_list, val_loss_list):
     """
