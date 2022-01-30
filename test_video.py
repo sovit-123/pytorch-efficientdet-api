@@ -105,11 +105,13 @@ if __name__ == '__main__':
         model_name=args['model'],
         num_classes=NUM_CLASSES,
         pretrained=True,
-        checkpoint_path=args['weights'],
         task='predict',
         image_size=(IMAGE_HEIGHT, IMAGE_WIDTH),
         bench_labeler=False
     )
+    if args['weights'] is not None:
+        checkpoint = torch.load(args['weights'])
+        model.load_state_dict(checkpoint)
     model.to(DEVICE).eval()
 
     # To count the total number of images iterated through
