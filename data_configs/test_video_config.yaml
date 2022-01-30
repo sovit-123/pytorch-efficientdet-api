@@ -1,6 +1,6 @@
 video_path: data/inference_data/video_1.mp4
-nc: 90
-classes: [
+NC: 90
+CLASSES: [
     'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
     'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'N/A', 'stop sign',
     'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',

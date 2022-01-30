@@ -57,6 +57,10 @@ if __name__ == '__main__':
         help='(optional) path to the data config file'
     )
     parser.add_argument(
+        '-w', '--weights', default=None,
+        help='path to trained checkpoint weights if providing custom YAML file'
+    )
+    parser.add_argument(
         '-i', '--input', default=None,
         help='path to the input video'
     )
@@ -76,8 +80,8 @@ if __name__ == '__main__':
     # Inference settings and constants
     IMAGE_WIDTH = int(model_configs[args['model']][0]['image_width'])
     IMAGE_HEIGHT = int(model_configs[args['model']][1]['image_height'])
-    NUM_CLASSES = data_configs['nc']
-    CLASSES = data_configs['classes']
+    NUM_CLASSES = data_configs['NC']
+    CLASSES = data_configs['CLASSES']
     OUT_DIR = set_infer_dir()
     COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
     DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -101,8 +105,10 @@ if __name__ == '__main__':
         model_name=args['model'],
         num_classes=NUM_CLASSES,
         pretrained=True,
+        checkpoint_path=args['weights'],
         task='predict',
-        image_size=(IMAGE_HEIGHT, IMAGE_WIDTH)
+        image_size=(IMAGE_HEIGHT, IMAGE_WIDTH),
+        bench_labeler=False
     )
     model.to(DEVICE).eval()
 

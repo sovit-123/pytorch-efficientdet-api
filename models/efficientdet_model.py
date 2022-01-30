@@ -9,7 +9,8 @@ def create_effdet_model(
     pretrained=True,
     task='train',
     image_size=None,
-    checkpoint_path=None
+    checkpoint_path=None,
+    bench_labeler=True
 ):
     model = create_model(
         model_name, 
@@ -18,6 +19,6 @@ def create_effdet_model(
         image_size=image_size,
         pretrained=pretrained,
         checkpoint_path=checkpoint_path,
-        bench_labeler=True
+        bench_labeler=bench_labeler
     )
     return model
