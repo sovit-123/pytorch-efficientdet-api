@@ -111,7 +111,7 @@ if __name__ == '__main__':
     )
     if args['weights'] is not None:
         checkpoint = torch.load(args['weights'])
-        model.load_state_dict(checkpoint)
+        model.load_state_dict(checkpoint['model_state_dict'])
     model.to(DEVICE).eval()
 
     # To count the total number of images iterated through

@@ -6,7 +6,11 @@ import glob as glob
 
 from xml.etree import ElementTree as et
 from torch.utils.data import Dataset, DataLoader
-from custom_utils import collate_fn, get_train_transform, get_valid_transform
+from custom_utils import (
+    collate_fn, 
+    get_train_transform, 
+    get_valid_transform,
+)
 
 # the dataset class
 class CustomDataset(Dataset):
@@ -71,6 +75,8 @@ class CustomDataset(Dataset):
             
             boxes.append([xmin_final, ymin_final, xmax_final, ymax_final])
         
+        if len(boxes) == 0:
+            return None
         # bounding box to tensor
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
         # area of the bounding boxes
@@ -89,12 +95,11 @@ class CustomDataset(Dataset):
         target["iscrowd"] = iscrowd
         image_id = torch.tensor([idx])
         target["image_id"] = image_id
-
         # apply the image transforms
         if self.transforms:
-            sample = self.transforms(image = image_resized,
-                                     bboxes = target['boxes'],
-                                     labels = labels)
+            sample = self.transforms(image=image_resized,
+                                     bboxes=target['boxes'],
+                                     labels=labels)
             image_resized = sample['image']
             target['boxes'] = torch.Tensor(sample['bboxes'])
             
@@ -142,31 +147,31 @@ def create_valid_loader(valid_dataset, batch_size, num_workers=0):
 # execute datasets.py using Python command from Terminal...
 # ... to visualize sample images
 # USAGE: python datasets.py
-if __name__ == '__main__':
-    # sanity check of the Dataset pipeline with sample visualization
-    dataset = CustomDataset(
-        TRAIN_DIR, RESIZE_TO, RESIZE_TO, CLASSES
-    )
-    print(f"Number of training images: {len(dataset)}")
+# if __name__ == '__main__':
+#     # sanity check of the Dataset pipeline with sample visualization
+#     dataset = CustomDataset(
+#         TRAIN_DIR, RESIZE_TO, RESIZE_TO, CLASSES
+#     )
+#     print(f"Number of training images: {len(dataset)}")
     
-    # function to visualize a single sample
-    def visualize_sample(image, target):
-        for box_num in range(len(target['boxes'])):
-            box = target['boxes'][box_num]
-            label = CLASSES[target['labels'][box_num]]
-            cv2.rectangle(
-                image, 
-                (int(box[0]), int(box[1])), (int(box[2]), int(box[3])),
-                (0, 255, 0), 2
-            )
-            cv2.putText(
-                image, label, (int(box[0]), int(box[1]-5)), 
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2
-            )
-        cv2.imshow('Image', image)
-        cv2.waitKey(0)
+#     # function to visualize a single sample
+#     def visualize_sample(image, target):
+#         for box_num in range(len(target['boxes'])):
+#             box = target['boxes'][box_num]
+#             label = CLASSES[target['labels'][box_num]]
+#             cv2.rectangle(
+#                 image, 
+#                 (int(box[0]), int(box[1])), (int(box[2]), int(box[3])),
+#                 (0, 255, 0), 2
+#             )
+#             cv2.putText(
+#                 image, label, (int(box[0]), int(box[1]-5)), 
+#                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2
+#             )
+#         cv2.imshow('Image', image)
+#         cv2.waitKey(0)
         
-    NUM_SAMPLES_TO_VISUALIZE = 5
-    for i in range(NUM_SAMPLES_TO_VISUALIZE):
-        image, target = dataset[i]
-        visualize_sample(image, target)
+#     NUM_SAMPLES_TO_VISUALIZE = 5
+#     for i in range(NUM_SAMPLES_TO_VISUALIZE):
+#         image, target = dataset[i]
+#         visualize_sample(image, target)

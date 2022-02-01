@@ -105,7 +105,7 @@ if __name__ == '__main__':
     )
     if args['weights'] is not None:
         checkpoint = torch.load(args['weights'])
-        model.load_state_dict(checkpoint)
+        model.load_state_dict(checkpoint['model_state_dict'])
     model.to(DEVICE).eval()
     with torch.no_grad():
         outputs = model(image_tensor.to(DEVICE))

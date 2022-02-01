@@ -1,0 +1,25 @@
+# Data configs.
+BATCH_SIZE: 4
+NUM_WORKERS: 4
+# TRAIN_DIR should be relative to train.py
+TRAIN_DIR: data/PlantDoc.v1-resize-416x416.voc/train
+# VALID_DIR should be relative to train.py
+VALID_DIR: data/PlantDoc.v1-resize-416x416.voc/test
+# Class names.
+CLASSES: [
+    'Blueberry leaf', 'Tomato leaf yellow virus', 'Peach leaf', 
+    'Raspberry leaf', 'Strawberry leaf', 'Tomato Septoria leaf spot', 
+    'Tomato leaf', 'Corn leaf blight', 'Bell_pepper leaf', 
+    'Potato leaf early blight', 'Tomato mold leaf', 
+    'Tomato leaf bacterial spot', 'Soyabean leaf', 'Bell_pepper leaf spot', 
+    'Tomato leaf mosaic virus', 'Squash Powdery mildew leaf', 'Apple leaf',
+    'Potato leaf late blight', 'Cherry leaf', 'grape leaf', 
+    'Tomato leaf late blight', 'Tomato Early blight leaf', 'Apple rust leaf',
+    'Apple Scab Leaf', 'grape leaf black rot', 'Corn rust leaf', 
+    'Corn Gray leaf spot', 'Soybean leaf', 'Potato leaf', 
+    'Tomato two spotted spider mites leaf'
+]
+# Number of classes.
+NC: 30
+# Whether to save the predictions of the validation set while training.
+SAVE_VALID_PREDICTION_IMAGES: True

@@ -62,6 +62,7 @@ def collate_fn(batch):
     To handle the data loading as different images may have different number 
     of objects and to handle varying size tensors as well.
     """
+    batch = list(filter(lambda x: x is not None, batch))
     return tuple(zip(*batch))
 
 # define the training tranforms
@@ -88,7 +89,6 @@ def get_valid_transform():
         'format': 'pascal_voc', 
         'label_fields': ['labels']
     })
-
 
 def show_transformed_image(train_loader, DEVICE, CLASSES):
     """
@@ -132,15 +132,6 @@ def save_model_state(epoch, model, optimizer, OUT_DIR):
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 }, f'{OUT_DIR}/last_model_state.pth')
-
-def save_checkpoint(model, OUT_DIR):
-    """
-    Function to save the checkpoint only.
-
-    :param model: The neural network model.
-    :param optimizer: The optimizer.
-    """
-    torch.save(model.state_dict(), f"{OUT_DIR}/last_model_ckpt.pth")
 
 def save_loss_plot(OUT_DIR, train_loss_list, val_loss_list):
     """
