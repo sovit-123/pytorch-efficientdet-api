@@ -23,8 +23,22 @@ class CustomDataset(Dataset):
         
         # get all the image paths in sorted order
         self.image_paths = glob.glob(f"{self.dir_path}/*.jpg")
+        self.annot_paths = glob.glob(f"{self.dir_path}/*.xml")
+        self.read_and_clean()
         self.all_images = [image_path.split(os.path.sep)[-1] for image_path in self.image_paths]
         self.all_images = sorted(self.all_images)
+        
+    def read_and_clean(self):
+        for annot_path in self.annot_paths:
+            tree = et.parse(annot_path)
+            root = tree.getroot()
+            object_present = False
+            for member in root.findall('object'):
+                object_present = True
+            if object_present == False:
+                print(f"Removing {annot_path} and corresponding image")
+                self.annot_paths.remove(annot_path)
+                self.image_paths.remove(annot_path.split('.xml')[0]+'.jpg')
 
     def __getitem__(self, idx):
         # capture the image name and the full image path
@@ -75,8 +89,6 @@ class CustomDataset(Dataset):
             
             boxes.append([xmin_final, ymin_final, xmax_final, ymax_final])
         
-        if len(boxes) == 0:
-            return None
         # bounding box to tensor
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
         # area of the bounding boxes
