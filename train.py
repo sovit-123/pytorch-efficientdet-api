@@ -18,7 +18,7 @@ import argparse
 import yaml
 
 if __name__ == '__main__':
-    # Construct the argument parser
+    # Construct the argument parser.
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-m', '--model', default='efficientdet_d0',
