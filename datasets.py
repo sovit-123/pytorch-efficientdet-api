@@ -14,22 +14,36 @@ from custom_utils import (
 
 # the dataset class
 class CustomDataset(Dataset):
-    def __init__(self, dir_path, width, height, classes, transforms=None):
+    def __init__(
+        self, images_path, labels_path, 
+        width, height, classes, transforms=None
+    ):
         self.transforms = transforms
-        self.dir_path = dir_path
+        self.images_path = images_path
+        self.labels_path = labels_path
         self.height = height
         self.width = width
         self.classes = classes
+        self.image_file_types = ['*.jpg', '*.jpeg', '*.png']
+        self.all_image_paths = []
         
         # get all the image paths in sorted order
-        self.image_paths = glob.glob(f"{self.dir_path}/*.jpg")
-        self.annot_paths = glob.glob(f"{self.dir_path}/*.xml")
+        for file_type in self.image_file_types:
+            self.all_image_paths.extend(glob.glob(f"{self.images_path}/{file_type}"))
+        self.all_annot_paths = glob.glob(f"{self.labels_path}/*.xml")
+        print()
+        # Remove all annotations and images when no object is present.
         self.read_and_clean()
-        self.all_images = [image_path.split(os.path.sep)[-1] for image_path in self.image_paths]
+        print()
+        self.all_images = [image_path.split(os.path.sep)[-1] for image_path in self.all_image_paths]
         self.all_images = sorted(self.all_images)
         
     def read_and_clean(self):
-        for annot_path in self.annot_paths:
+        """
+        This function will discard any images and labels when the XML 
+        file does not contain any object.
+        """
+        for annot_path in self.all_annot_paths:
             tree = et.parse(annot_path)
             root = tree.getroot()
             object_present = False
@@ -37,13 +51,13 @@ class CustomDataset(Dataset):
                 object_present = True
             if object_present == False:
                 print(f"Removing {annot_path} and corresponding image")
-                self.annot_paths.remove(annot_path)
-                self.image_paths.remove(annot_path.split('.xml')[0]+'.jpg')
+                self.all_annot_paths.remove(annot_path)
+                self.all_image_paths.remove(annot_path.split('.xml')[0]+'.jpg')
 
     def __getitem__(self, idx):
         # capture the image name and the full image path
         image_name = self.all_images[idx]
-        image_path = os.path.join(self.dir_path, image_name)
+        image_path = os.path.join(self.labels_path, image_name)
 
         # read the image
         image = cv2.imread(image_path)
@@ -54,7 +68,7 @@ class CustomDataset(Dataset):
         
         # capture the corresponding XML file for getting the annotations
         annot_filename = image_name[:-4] + '.xml'
-        annot_file_path = os.path.join(self.dir_path, annot_filename)
+        annot_file_path = os.path.join(self.labels_path, annot_filename)
         
         boxes = []
         labels = []
@@ -121,16 +135,22 @@ class CustomDataset(Dataset):
         return len(self.all_images)
 
 # prepare the final datasets and data loaders
-def create_train_dataset(train_dir, resize_width, resize_height, classes):
+def create_train_dataset(
+    train_dir_images, train_dir_labels, 
+    resize_width, resize_height, classes
+):
     train_dataset = CustomDataset(
-        train_dir, 
+        train_dir_images, train_dir_labels, 
         resize_width, resize_height, 
         classes, get_train_transform()
     )
     return train_dataset
-def create_valid_dataset(valid_dir, resize_width, resize_height, classes):
+def create_valid_dataset(
+    valid_dir_images, valid_dir_labels, 
+    resize_width, resize_height, classes
+):
     valid_dataset = CustomDataset(
-        valid_dir, 
+        valid_dir_images, valid_dir_labels,
         resize_width, resize_height, 
         classes, get_valid_transform()
     )

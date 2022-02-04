@@ -47,8 +47,10 @@ if __name__ == '__main__':
         data_configs = yaml.safe_load(file)
     
     # Settings/parameters/constants.
-    TRAIN_DIR = data_configs['TRAIN_DIR']
-    VALID_DIR = data_configs['VALID_DIR']
+    TRAIN_DIR_IMAGES = data_configs['TRAIN_DIR_IMAGES']
+    TRAIN_DIR_LABELS = data_configs['TRAIN_DIR_LABELS']
+    VALID_DIR_IMAGES = data_configs['VALID_DIR_IMAGES']
+    VALID_DIR_LABELS = data_configs['VALID_DIR_LABELS']
     CLASSES = data_configs['CLASSES']
     NUM_CLASSES = data_configs['NC']
     NUM_WORKERS = data_configs['NUM_WORKERS']
@@ -63,10 +65,12 @@ if __name__ == '__main__':
     IMAGE_HEIGHT = int(model_configs[args['model']][1]['image_height'])
     device = 'cuda:0'
     train_dataset = create_train_dataset(
-        TRAIN_DIR, IMAGE_WIDTH, IMAGE_HEIGHT, CLASSES
+        TRAIN_DIR_IMAGES, TRAIN_DIR_LABELS,
+        IMAGE_WIDTH, IMAGE_HEIGHT, CLASSES
     )
     valid_dataset = create_valid_dataset(
-        VALID_DIR, IMAGE_WIDTH, IMAGE_HEIGHT, CLASSES
+        VALID_DIR_IMAGES, VALID_DIR_LABELS, 
+        IMAGE_WIDTH, IMAGE_HEIGHT, CLASSES
     )
     train_loader = create_train_loader(train_dataset, BATCH_SIZE, NUM_WORKERS)
     valid_loader = create_valid_loader(valid_dataset, BATCH_SIZE, NUM_WORKERS)
