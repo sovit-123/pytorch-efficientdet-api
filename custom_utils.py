@@ -194,7 +194,7 @@ def save_validation_results(images, detections, counter, OUT_DIR):
                 image, 
                 (int(box[0]), int(box[1])),
                 (int(box[2]), int(box[3])),
-                (255, 255, 255), 2
+                (0, 0, 255), 2
             )
         cv2.imwrite(f"{OUT_DIR}/image_{i}_{counter}.jpg", image*255.)
 

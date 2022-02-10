@@ -31,10 +31,8 @@ class CustomDataset(Dataset):
         for file_type in self.image_file_types:
             self.all_image_paths.extend(glob.glob(f"{self.images_path}/{file_type}"))
         self.all_annot_paths = glob.glob(f"{self.labels_path}/*.xml")
-        print()
         # Remove all annotations and images when no object is present.
         self.read_and_clean()
-        print()
         self.all_images = [image_path.split(os.path.sep)[-1] for image_path in self.all_image_paths]
         self.all_images = sorted(self.all_images)
         
@@ -57,7 +55,7 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx):
         # capture the image name and the full image path
         image_name = self.all_images[idx]
-        image_path = os.path.join(self.labels_path, image_name)
+        image_path = os.path.join(self.images_path, image_name)
 
         # read the image
         image = cv2.imread(image_path)

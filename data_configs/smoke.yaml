@@ -1,0 +1,15 @@
+# Data configs.
+BATCH_SIZE: 8
+NUM_WORKERS: 4
+# TRAIN_DIR should be relative to train.py
+TRAIN_DIR_IMAGES: data/smoke_pascal_voc/archive/train/images
+TRAIN_DIR_LABELS: data/smoke_pascal_voc/archive/train/annotations
+# VALID_DIR should be relative to train.py
+VALID_DIR_IMAGES: data/smoke_pascal_voc/archive/valid/images
+VALID_DIR_LABELS: data/smoke_pascal_voc/archive/valid/annotations
+# Class names.
+CLASSES: ['smoke']
+# Number of classes.
+NC: 1
+# Whether to save the predictions of the validation set while training.
+SAVE_VALID_PREDICTION_IMAGES: True
