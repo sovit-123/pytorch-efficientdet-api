@@ -1,6 +1,3 @@
-# Data configs.
-BATCH_SIZE: 8
-NUM_WORKERS: 4
 # TRAIN_DIR should be relative to train.py
 TRAIN_DIR_IMAGES: data/smoke_pascal_voc/archive/train/images
 TRAIN_DIR_LABELS: data/smoke_pascal_voc/archive/train/annotations

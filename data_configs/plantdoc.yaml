@@ -1,6 +1,3 @@
-# Data configs.
-BATCH_SIZE: 4
-NUM_WORKERS: 4
 # TRAIN_DIR should be relative to train.py
 TRAIN_DIR_IMAGES: data/PlantDoc.v1-resize-416x416.voc/train
 TRAIN_DIR_LABELS: data/PlantDoc.v1-resize-416x416.voc/train

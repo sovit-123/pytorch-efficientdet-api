@@ -37,6 +37,14 @@ if __name__ == '__main__':
         '-e', '--epochs', default=5, type=int,
         help='number of epochs to train for'
     )
+    parser.add_argument(
+        '-w', '--workers', default=4, type=int,
+        help='number of workers for data processing/transforms/augmentations'
+    )
+    parser.add_argument(
+        '-b', '--batch-size', dest='batch_size', default=8, type=int, 
+        help='batch size to load the data'
+    )
     args = vars(parser.parse_args())
 
     # Load the model configurations
@@ -53,11 +61,11 @@ if __name__ == '__main__':
     VALID_DIR_LABELS = data_configs['VALID_DIR_LABELS']
     CLASSES = data_configs['CLASSES']
     NUM_CLASSES = data_configs['NC']
-    NUM_WORKERS = data_configs['NUM_WORKERS']
+    NUM_WORKERS = args['workers']
     DEVICE = args['device']
     NUM_EPOCHS = args['epochs']
     SAVE_VALID_PREDICTIONS = data_configs['SAVE_VALID_PREDICTION_IMAGES']
-    BATCH_SIZE = data_configs['BATCH_SIZE']
+    BATCH_SIZE = args['batch_size']
     OUT_DIR = set_training_dir()
 
     # Model configurations
