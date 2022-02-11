@@ -21,7 +21,7 @@ if __name__ == '__main__':
     # Construct the argument parser.
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-m', '--model', default='efficientdet_d0',
+        '-m', '--model', default='tf_efficientdet_lite0',
         help='name of the model'
     )
     parser.add_argument(
