@@ -11,5 +11,5 @@ scikit-learn
 scipy
 timm>=0.4.12
 torch>=1.10.0
-torchvision
+torchvision>=0.11.2
 numpy
