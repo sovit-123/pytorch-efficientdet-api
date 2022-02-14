@@ -169,6 +169,15 @@ def save_train_loss_plot(OUT_DIR, train_loss_list):
     print('SAVING PLOTS COMPLETE...')
     plt.close('all')
 
+def denormalize(x, mean=None, std=None):
+    # 3, H, W, B
+    # print(x.shape)
+    # ten = x.clone().permute(1, 2, 3, 0)
+    for t, m, s in zip(x, mean, std):
+        t.mul_(s).add_(m)
+    # B, 3, H, W
+    return torch.clamp(x, 0, 1)
+
 def save_validation_results(images, detections, counter, OUT_DIR):
     """
     Function to save validation results if provided in `config.py`.
@@ -177,11 +186,14 @@ def save_validation_results(images, detections, counter, OUT_DIR):
     :param detections: All the detection results.
     :param counter: Step counter for saving with unique ID.
     """
+    IMG_MEAN = [0.485, 0.456, 0.406]
+    IMG_STD = [0.229, 0.224, 0.225]
     for i, detection in enumerate(detections):
         image_c = images[i].clone()
+        image_c = denormalize(image_c, IMG_MEAN, IMG_STD)
         image_c = image_c.detach().cpu().numpy().astype(np.float32)
         image = np.transpose(image_c, (1, 2, 0))
-        image = image / 2 + 0.5
+
         image = np.ascontiguousarray(image, dtype=np.float32)
 
         scores = detection[:, 4].cpu()
