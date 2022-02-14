@@ -1,0 +1,15 @@
+albumentations>=1.1.0
+matplotlib
+omegaconf>=2.0
+opencv-python
+opencv-python-headless
+Pillow
+pycocotools>=2.0.2
+PyYAML
+scikit-image
+scikit-learn
+scipy
+timm>=0.4.12
+torch>=1.4.0
+torchvision
+numpy
