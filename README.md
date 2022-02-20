@@ -9,6 +9,15 @@ Get started with training within 5 minutes if you have the images and XML annota
 
 
 
+## Go To
+
+* [Setup for Ubuntu](#Setup-for-Ubuntu)
+* [Setup on Windows](#Setup-on-Windows)
+* [Train on Custom Dataset](#Train-on-Custom-Dataset)
+* [Inference](#Inference)
+
+
+
 ## Setup for Ubuntu
 
 1. Clone the repository.
@@ -81,7 +90,7 @@ Get started with training within 5 minutes if you have the images and XML annota
 
 
 
-## Getting Started with Custom Dataset
+## Train on Custom Dataset
 
 Taking an exmaple of the [smoke dataset](https://www.kaggle.com/didiruh/smoke-pascal-voc) from Kaggle. Let's say that the dataset is in the `data/smoke_pascal_voc` directory in the following format. And the `smoke.yaml` is in the `data_configs` directory.
 
