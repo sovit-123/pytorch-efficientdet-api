@@ -9,6 +9,12 @@ Get started with training within 5 minutes if you have the images and XML annota
 
 
 
+## Get Started with Inference
+
+​																													[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1-_g9yqE3DA4Q3r2Tw1jRG86SCshIAOx1?usp=sharing) [![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://www.kaggle.com/sovitrath/pytorch-efficientdet-api-coco-model-inference)
+
+
+
 ## Go To
 
 * [Setup for Ubuntu](#Setup-for-Ubuntu)
