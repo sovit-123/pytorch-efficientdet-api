@@ -19,6 +19,7 @@ import argparse
 import yaml
 import os
 import time
+import matplotlib.pyplot as plt
 
 from models.efficientdet_model import create_effdet_model
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
@@ -70,6 +71,10 @@ if __name__ == '__main__':
     parser.add_argument(
         '-si', '--show-image', dest='show_image', action='store_true',
         help='visualize output only if this argument is passed'
+    )
+    parser.add_argument(
+        '-mpl', '--mpl-show', dest='mpl_show', action='store_true',
+        help='visualize using matplotlib, helpful in notebooks'
     )
     args = vars(parser.parse_args())
 
@@ -134,5 +139,9 @@ if __name__ == '__main__':
     if args['show_image']:
         cv2.imshow('Prediction', result)
         cv2.waitKey(0)
-        cv2.imwrite(f"{OUT_DIR}/{save_name}.jpg", result)
-        cv2.destroyAllWindows()
+    if args['mpl_show']:
+        plt.imshow(result[:, :, ::-1])
+        plt.axis('off')
+        plt.show()
+    cv2.imwrite(f"{OUT_DIR}/{save_name}.jpg", result)
+    cv2.destroyAllWindows()
