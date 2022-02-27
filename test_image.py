@@ -18,6 +18,7 @@ import albumentations as A
 import argparse
 import yaml
 import os
+import time
 
 from models.efficientdet_model import create_effdet_model
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
@@ -66,6 +67,10 @@ if __name__ == '__main__':
         '-th', '--threshold', default=0.3, type=float,
         help='detection threshold'
     )
+    parser.add_argument(
+        '-si', '--show-image', dest='show_image', action='store_true',
+        help='visualize output only if this argument is passed'
+    )
     args = vars(parser.parse_args())
 
     # Load the model configurations
@@ -107,8 +112,10 @@ if __name__ == '__main__':
         checkpoint = torch.load(args['weights'])
         model.load_state_dict(checkpoint['model_state_dict'])
     model.to(DEVICE).eval()
+    start_time = time.time()
     with torch.no_grad():
         outputs = model(image_tensor.to(DEVICE))
+    forward_end_time = time.time()
     
     result = draw_bboxes(
         image, outputs[0], 
@@ -116,8 +123,16 @@ if __name__ == '__main__':
         args['threshold'],
         COLORS, CLASSES
     )
+    final_end_time = time.time()
+
+    forward_pass_time = forward_end_time - start_time
+    forward_and_annot_time = final_end_time - start_time
+    print(f"Forward pass time: {forward_pass_time:.3f} seconds")
+    print(f"Forward pass + annotation time: {forward_and_annot_time:.3f} seconds")
+    
     save_name = IMAGE_PATH.split(os.path.sep)[-1].split('.')[0]
-    cv2.imshow('Prediction', result)
-    cv2.waitKey(0)
-    cv2.imwrite(f"{OUT_DIR}/{save_name}.jpg", result)
-    cv2.destroyAllWindows()
+    if args['show_image']:
+        cv2.imshow('Prediction', result)
+        cv2.waitKey(0)
+        cv2.imwrite(f"{OUT_DIR}/{save_name}.jpg", result)
+        cv2.destroyAllWindows()

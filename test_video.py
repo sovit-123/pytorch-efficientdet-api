@@ -68,6 +68,10 @@ if __name__ == '__main__':
         '-th', '--threshold', default=0.3, type=float,
         help='detection threshold'
     )
+    parser.add_argument(
+    '-si', '--show-image', dest='show_image', action='store_true',
+    help='visualize output only if this argument is passed'
+    )
     args = vars(parser.parse_args())
 
     # Load the model configurations
@@ -135,11 +139,12 @@ if __name__ == '__main__':
             # Forward pass.
             with torch.no_grad():
                 outputs = model(image_tensor.to(DEVICE))
-            end_time = time.time()
+            forward_end_time = time.time()
 
-            time_taken = (end_time-start_time)
+            forward_pass_time = forward_end_time - start_time
+            
             # Get the current fps.
-            fps = 1 / (time_taken)
+            fps = 1 / (forward_pass_time)
             # Add `fps` to `total_fps`.
             total_fps += fps
             # Increment frame count.
@@ -159,12 +164,18 @@ if __name__ == '__main__':
                 1, (0, 255, 0), 2, 
                 lineType=cv2.LINE_AA
             )
-            cv2.imshow('Prediction', result)
+            final_end_time = time.time()
+            forward_and_annot_time = final_end_time - start_time
+            print_string = f"Frame: {frame_count}, Forward pass FPS: {fps:.3f}, "
+            print_string += f"Forward pass time: {forward_pass_time:.3f} seconds, "
+            print_string += f"Forward pass + annotation time: {forward_and_annot_time:.3f} seconds"
+            print(print_string)            
             out.write(result)
-            print(f"Frame {frame_count}, time taken: {(time_taken):.3f}")
-            # Press `q` to exit
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+            if args['show_image']:
+                cv2.imshow('Prediction', result)
+                # Press `q` to exit
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
         else:
             break
 
