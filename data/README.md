@@ -6,6 +6,7 @@
 
 * `PlantDoc.v1-resize-416x416.voc`: https://public.roboflow.com/object-detection/plantdoc.
 * `smoke_pascal_voc`: https://www.kaggle.com/didiruh/smoke-pascal-voc.
+* `Exclusively Dark (ExDARK) dataset`: https://github.com/cs-chan/Exclusively-Dark-Image-Dataset.
 
 
 
