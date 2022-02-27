@@ -1,4 +1,5 @@
 *__pycache__
 data/*
+!data/inference_data/*.jpg
 !data/README.md
 outputs/
